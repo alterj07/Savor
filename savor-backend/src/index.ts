@@ -12,7 +12,6 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Routes will be added below
 import scanRouter from './routes/scan';
 app.use('/api/scan', scanRouter);
 

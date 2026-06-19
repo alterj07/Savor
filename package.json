@@ -41,5 +41,13 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write ."
   },
+  "plugins": [
+    [
+      "expo-location",
+      {
+        "locationWhenInUsePermission": "Savor uses your location to identify nearby restaurants and help you find places that match your dietary needs."
+      }
+    ]
+  ],
   "private": true
 }

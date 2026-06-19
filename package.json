@@ -2,6 +2,7 @@
   "name": "savor",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "scheme": "savor",
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
     "expo": "~56.0.12",
@@ -47,6 +48,9 @@
       {
         "locationWhenInUsePermission": "Savor uses your location to identify nearby restaurants and help you find places that match your dietary needs."
       }
+    ],
+    [
+      "expo-router"
     ]
   ],
   "private": true

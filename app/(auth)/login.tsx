@@ -27,6 +27,25 @@ export default function LoginScreen() {
     } else {
       router.replace('/(app)/(tabs)/scan');
     }
+
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('onboarding_complete')
+      .eq('id', data.user.id)
+      .single();
+ 
+    setLoading(false);
+ 
+    if (profileError) {
+      router.replace('/(auth)/onboarding');
+      return;
+    }
+ 
+    if (profileData.onboarding_complete) {
+      router.replace('/(app)/(tabs)/scan');
+    } else {
+      router.replace('/(auth)/onboarding');
+    }
   };
 
   return (

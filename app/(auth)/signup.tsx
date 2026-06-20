@@ -24,8 +24,7 @@ export default function SignupScreen() {
     if (error) {
       Alert.alert('Signup Failed', error.message);
     } else {
-      // onAuthStateChange in _layout.tsx will handle the redirect
-      router.replace('/(app)/(tabs)/scan');
+      router.replace('/(auth)/onboarding');
     }
   };
 

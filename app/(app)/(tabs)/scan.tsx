@@ -4,6 +4,7 @@ import {
   View, Text, TouchableOpacity, StyleSheet,
   Dimensions, Alert
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
@@ -72,7 +73,6 @@ export default function ScanScreen() {
         style={StyleSheet.absoluteFill}
         facing={facing}
       />
-
       <View style={styles.overlay}>
         <View style={styles.overlayTop} />
         <View style={styles.overlayMiddle}>
@@ -116,7 +116,7 @@ export default function ScanScreen() {
 const FRAME_MARGIN = (SCREEN_WIDTH - FRAME_SIZE) / 2;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  container: { flex: 1, backgroundColor: '#000', justifyContent: 'center' },
   permissionText: { color: '#fff', textAlign: 'center', margin: 24, fontSize: 16 },
   button: {
     backgroundColor: '#2E7D32',
@@ -126,10 +126,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: { color: '#fff', fontWeight: '600' },
-
-  overlay: { ...StyleSheet.absoluteFill },
+  overlay: { flex: 3, justifyContent: 'center' },
   overlayTop: {
     height: FRAME_MARGIN,
+    flex: 2,
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   overlayMiddle: {
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     height: FRAME_SIZE,
   },
   overlayBottom: {
-    flex: 1,
+    flex: 3,
     backgroundColor: 'rgba(0,0,0,0.6)',
     alignItems: 'center',
     paddingTop: 24,

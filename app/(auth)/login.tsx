@@ -19,13 +19,12 @@ export default function LoginScreen() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
+      setLoading(false);
       Alert.alert('Login Failed', error.message);
-    } else {
-      router.replace('/(app)/(tabs)/scan');
+      return;
     }
 
     const { data: profileData, error: profileError } = await supabase

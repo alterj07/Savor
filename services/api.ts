@@ -1,4 +1,4 @@
-import { UserProfile } from '../types';
+import { MenuItemResult, UserProfile } from '../types';
 import { supabase } from './supabase';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';

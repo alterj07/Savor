@@ -123,9 +123,15 @@ Analyze this menu for the user's dietary needs and return the JSON response.`;
     throw new Error(`Google API error ${response.status}: ${error}`);
   }
 
-  const data = await response.json();
-  
-  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  interface GoogleApiResponse {
+  content?: Array<{ text?: string }>;
+}
+
+  const data = (await response.json()) as GoogleApiResponse;
+  const rawText = data.content?.[0]?.text;
+
+  // const data = await response.json();
+  // const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!rawText) throw new Error('Empty response from Google');
 

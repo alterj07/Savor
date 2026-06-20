@@ -28,8 +28,13 @@ export async function extractTextFromImage(base64Image: string): Promise<string>
     throw new Error(`Vision API error: ${response.status}`);
   }
 
-  const data = await response.json();
+  interface VisionApiResponse {
+    responses?: Array<{
+      fullTextAnnotation?: { text?: string };
+    }>;
+  }
 
+  const data = (await response.json()) as VisionApiResponse;
   const fullText = data.responses?.[0]?.fullTextAnnotation?.text;
 
   return fullText || '';

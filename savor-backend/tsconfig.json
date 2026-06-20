@@ -4,13 +4,20 @@
     "outDir": "./dist",
     "module": "commonjs",
     "target": "es2020",
-    "lib": ["es2020"],
-    "types": ["node"],
+    "lib": [
+      "es2020"
+    ],
+    "types": [
+      "node"
+    ],
     "sourceMap": true,
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ],
+  "extends": "expo/tsconfig.base"
 }

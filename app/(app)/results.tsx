@@ -34,7 +34,9 @@ export default function ResultsScreen() {
 
     try {
       const data = await analyzeMenu(imageUri!, profile!);
+      console.log('pre');
       setResults(data.results.items);
+      console.log('post');
     } catch (err: any) {
       setError(err.message || 'Analysis failed. Please try again.');
     } finally {

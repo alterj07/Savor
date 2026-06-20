@@ -15,8 +15,8 @@ export default function TabLayout() {
         options={{ title: 'History' }}
       />
       <Tabs.Screen
-        name="profile"
-        options={{ title: 'Profile' }}
+        name="settings"
+        options={{ title: 'Settings' }}
       />
     </Tabs>
   );

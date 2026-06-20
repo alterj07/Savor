@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, StyleSheet,
   TouchableOpacity, ActivityIndicator
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { supabase } from '../../../services/supabase';
 import { useAuthStore } from '../../../stores/authStore';
@@ -113,7 +114,7 @@ export default function HistoryScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.header}>Scan History</Text>
       <FlatList
         data={scans}
@@ -131,7 +132,7 @@ export default function HistoryScreen() {
           </View>
         }
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

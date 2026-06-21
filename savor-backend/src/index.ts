@@ -15,7 +15,7 @@ app.get('/health', (_req, res) => {
 import scanRouter from './routes/scan';
 app.use('/api/scan', scanRouter);
 
-const PORT = process.env.EXPO_PUBLIC_API_URL?.split(':').pop() || 8082;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Savor backend running on port ${PORT}`);
 });

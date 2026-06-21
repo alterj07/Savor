@@ -4,7 +4,7 @@ import { Stack, router } from 'expo-router';
 import { useAuthStore } from '../../stores/authStore';
 
 export default function AppLayout() {
-  const { session, isLoading } = useAuthStore();
+  const { session, isLoading, isProfileLoading } = useAuthStore();
 
   useEffect(() => {
     if (!isLoading && !session) {
@@ -12,7 +12,7 @@ export default function AppLayout() {
     }
   }, [session, isLoading]);
 
-  if (isLoading) {
+  if (isLoading || isProfileLoading) {
     return null;
   }
 

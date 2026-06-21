@@ -1,21 +1,16 @@
 import { MenuItemResult, UserProfile } from '../types';
 import { supabase } from './supabase';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8082/api';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+import * as FileSystem from 'expo-file-system/legacy';
 
 async function imageUriToBase64(uri: string): Promise<string> {
-  const response = await fetch(uri);
-  const blob = await response.blob();
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(',')[1]);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
+  const base64 = await FileSystem.readAsStringAsync(uri, {
+    encoding: FileSystem.EncodingType.Base64,
   });
+  return base64;
 }
 
 export async function saveScanToHistory(

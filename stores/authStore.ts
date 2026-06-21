@@ -8,6 +8,7 @@ interface AuthState {
   user: User | null;
   profile: UserProfile | null;
   isLoading: boolean;
+  isProfileLoading: boolean;
 
   setSession: (session: Session | null) => void;
   setProfile: (profile: UserProfile | null) => void;
@@ -20,6 +21,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   profile: null,
   isLoading: true,
+  isProfileLoading: false,
 
   setSession: (session) =>
     set({
@@ -39,6 +41,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
+    set({ isProfileLoading: true });
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -46,7 +50,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .single();
 
     if (!error && data) {
-      set({ profile: data as UserProfile });
+      set({ profile: data as UserProfile, isProfileLoading: false });
+    } else {
+      set({ isProfileLoading: false });
     }
   },
 }));

@@ -79,8 +79,8 @@ export async function analyzeMenuWithAI(
   menuText: string,
   userProfile: UserProfile
 ): Promise<{ items: MenuItemResult[]; scan_quality: string; scan_notes: string }> {
-  const apiKey = process.env.GOOGLE_API_KEY;
-  if (!apiKey) throw new Error('GOOGLE_API_KEY not set');
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
   const userMessage = `
 ## User Dietary Profile
@@ -94,49 +94,49 @@ ${menuText}
 
 Analyze this menu for the user's dietary needs and return the JSON response.`;
 
-  const model = 'gemini-1.5-flash'; 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const model = 'claude-haiku-4-5-20251001';
+  const url = 'https://api.anthropic.com/v1/messages';
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: SYSTEM_PROMPT }]
-      },
-      contents: [
+      model,
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: [
         {
           role: 'user',
-          parts: [{ text: userMessage }]
-        }
+          content: userMessage,
+        },
       ],
-      generationConfig: {
-        maxOutputTokens: 4096,
-      }
     }),
   });
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Google API error ${response.status}: ${error}`);
+    throw new Error(`Anthropic API error ${response.status}: ${error}`);
   }
 
-  interface GoogleApiResponse {
-  content?: Array<{ text?: string }>;
-}
+  interface AnthropicApiResponse {
+    content?: Array<{ type: string; text?: string }>;
+  }
 
-  const data = (await response.json()) as GoogleApiResponse;
-  const rawText = data.content?.[0]?.text;
+  const data = (await response.json()) as AnthropicApiResponse;
+  const rawText = data.content
+    ?.filter((block) => block.type === 'text')
+    .map((block) => block.text || '')
+    .join('');
 
-  // const data = await response.json();
-  // const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (!rawText) throw new Error('Empty response from Google');
+  if (!rawText) throw new Error('Empty response from Anthropic');
 
   return parseAIResponse(rawText);
 }
+
 function parseAIResponse(rawText: string): {
   items: MenuItemResult[];
   scan_quality: string;
@@ -167,7 +167,6 @@ function parseAIResponse(rawText: string): {
       scan_quality: parsed.scan_quality || 'unknown',
       scan_notes: parsed.scan_notes || '',
     };
-
   } catch (error) {
     console.error('Failed to parse AI response:', error);
     console.error('Raw response:', rawText);

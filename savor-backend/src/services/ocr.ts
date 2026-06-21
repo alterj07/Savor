@@ -1,41 +1,57 @@
-export async function extractTextFromImage(base64Image: string): Promise<string> {
-  const apiKey = process.env.GOOGLE_VISION_API_KEY;
+export async function extractTextFromImage(
+  base64Image: string,
+  mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg'
+): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
-  if (!apiKey) throw new Error('GOOGLE_VISION_API_KEY not set');
-
-  const response = await fetch(
-    `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        requests: [
-          {
-            image: { content: base64Image },
-            features: [
-              {
-                type: 'DOCUMENT_TEXT_DETECTION',
-                maxResults: 1,
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 4096,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mediaType,
+                data: base64Image,
               },
-            ],
-          },
-        ],
-      }),
-    }
-  );
+            },
+            {
+              type: 'text',
+              text: 'Extract all text from this image exactly as it appears, preserving line breaks and reading order. Return ONLY the raw extracted text with no commentary, preamble, or explanation.',
+            },
+          ],
+        },
+      ],
+    }),
+  });
 
   if (!response.ok) {
-    throw new Error(`Vision API error: ${response.status}`);
+    const errorBody = await response.text();
+    console.error('[Savor] Anthropic API error body:', errorBody);
+    throw new Error(`Anthropic API error: ${response.status} — ${errorBody}`);
   }
 
-  interface VisionApiResponse {
-    responses?: Array<{
-      fullTextAnnotation?: { text?: string };
-    }>;
+  interface AnthropicApiResponse {
+    content?: Array<{ type: string; text?: string }>;
   }
 
-  const data = (await response.json()) as VisionApiResponse;
-  const fullText = data.responses?.[0]?.fullTextAnnotation?.text;
+  const data = (await response.json()) as AnthropicApiResponse;
+  const fullText = data.content
+    ?.filter((block) => block.type === 'text')
+    .map((block) => block.text || '')
+    .join('');
 
   return fullText || '';
 }

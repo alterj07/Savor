@@ -1,7 +1,7 @@
 import { MenuItemResult, UserProfile } from '../types';
 import { supabase } from './supabase';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8082/api';
 
 async function imageUriToBase64(uri: string): Promise<string> {
   const response = await fetch(uri);

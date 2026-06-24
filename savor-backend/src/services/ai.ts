@@ -78,7 +78,7 @@ Return ONLY a valid JSON object. No markdown, no preamble, no explanation outsid
 export async function analyzeMenuWithAI(
   menuText: string,
   userProfile: UserProfile
-): Promise<{ items: MenuItemResult[]; scan_quality: string; scan_notes: string }> {
+): Promise<{ items: MenuItemResult[]; scan_quality: string; scan_notes: string; parse_failed?: boolean }> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
@@ -106,7 +106,7 @@ Analyze this menu for the user's dietary needs and return the JSON response.`;
     },
     body: JSON.stringify({
       model,
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: SYSTEM_PROMPT,
       messages: [
         {
@@ -124,6 +124,7 @@ Analyze this menu for the user's dietary needs and return the JSON response.`;
 
   interface AnthropicApiResponse {
     content?: Array<{ type: string; text?: string }>;
+    stop_reason?: string;
   }
 
   const data = (await response.json()) as AnthropicApiResponse;
@@ -134,6 +135,16 @@ Analyze this menu for the user's dietary needs and return the JSON response.`;
 
   if (!rawText) throw new Error('Empty response from Anthropic');
 
+  if (data.stop_reason === 'max_tokens') {
+    console.error('[Savor] Claude response was truncated by max_tokens — menu may be too long for current limit.');
+    return {
+      items: [],
+      scan_quality: 'poor',
+      scan_notes: 'This menu was too long to fully analyze. Try scanning a smaller section at a time.',
+      parse_failed: true,
+    };
+  }
+
   return parseAIResponse(rawText);
 }
 
@@ -141,6 +152,7 @@ function parseAIResponse(rawText: string): {
   items: MenuItemResult[];
   scan_quality: string;
   scan_notes: string;
+  parse_failed?: boolean;
 } {
   try {
     const cleaned = rawText
@@ -175,6 +187,7 @@ function parseAIResponse(rawText: string): {
       items: [],
       scan_quality: 'poor',
       scan_notes: 'Analysis failed — please try again with a clearer photo',
+      parse_failed: true,
     };
   }
 }
